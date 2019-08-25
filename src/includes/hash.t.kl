@@ -1,4 +1,0 @@
-hashNode FROM hash = STRUCTURE
-	key     : STRING[HASH_KEYSIZE]
-	val     : STRING[HASH_VALSIZE]
-ENDSTRUCTURE

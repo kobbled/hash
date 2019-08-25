@@ -1,0 +1,12 @@
+%ifndef hash_private_h
+%define hash_private_h
+
+ROUTINE djb2(str : STRING) : INTEGER FROM hash
+ROUTINE jsStrHash(str : STRING) : INTEGER FROM hash
+ROUTINE hModHash(key : STRING; len : INTEGER) : INTEGER FROM hash
+ROUTINE hGetIndex(key : STRING; get : BOOLEAN; tbl : ARRAY OF hashNode) : INTEGER FROM hash
+ROUTINE hPut(key : STRING; value : STRING; tbl : ARRAY OF hashNode) : BOOLEAN FROM hash
+ROUTINE hGet(key : STRING; tbl : ARRAY OF hashNode) : STRING FROM hash
+ROUTINE hDel(key : STRING; tbl : ARRAY OF hashNode) : BOOLEAN FROM hash
+
+%endif

@@ -1,12 +1,18 @@
 PROGRAM hash
 %NOLOCKGROUP
-CONST
-	%INCLUDE includes/hash.c
 
-TYPE
-	%INCLUDE includes/hash.t
+%INCLUDE hash.klt
 
-ROUTINE djb2(str : STRING) : INTEGER
+%INCLUDE strings.klh
+%INCLUDE hash.private.klh
+%INCLUDE hash.klh
+
+BEGIN
+END hash
+
+--Private Members
+
+ROUTINE djb2
 VAR
 	hash : INTEGER
 	i    : INTEGER
@@ -21,7 +27,7 @@ BEGIN
 END djb2
 
 -- From Java 1.5 string library
-ROUTINE jsStrHash(str : STRING) : INTEGER
+ROUTINE jsStrHash
 VAR
 	hash : INTEGER
 	i    : INTEGER
@@ -33,7 +39,7 @@ BEGIN
 	RETURN(hash)
 END jsStrHash
 
-ROUTINE hModHash(key : STRING; len : INTEGER) : INTEGER
+ROUTINE hModHash
 VAR
 	hash : INTEGER
 BEGIN
@@ -41,7 +47,7 @@ BEGIN
 	RETURN(hash MOD len + 1)
 END hModHash
 
-ROUTINE hGetIndex(key : STRING; get : BOOLEAN; tbl : ARRAY OF hashNode) : INTEGER
+ROUTINE hGetIndex
 VAR
 	hash      : INTEGER
 	tblLength : INTEGER
@@ -79,7 +85,7 @@ BEGIN
 END hGetIndex
 
 
-ROUTINE hPut(key : STRING; value : STRING; tbl : ARRAY OF hashNode) : BOOLEAN
+ROUTINE hPut
 VAR
 	index : INTEGER
 BEGIN
@@ -93,7 +99,7 @@ BEGIN
 	ENDIF
 END hPut
 
-ROUTINE hGet(key : STRING; tbl : ARRAY OF hashNode) : STRING
+ROUTINE hGet
 VAR
 	index : INTEGER
 BEGIN
@@ -105,7 +111,7 @@ BEGIN
 	RETURN('')
 END hGet
 
-ROUTINE hDel(key : STRING; tbl : ARRAY OF hashNode) : BOOLEAN
+ROUTINE hDel
 VAR
 	index : INTEGER
 BEGIN
@@ -120,7 +126,9 @@ BEGIN
 	RETURN(FALSE)
 END hDel
 
-ROUTINE hashPut(key : STRING; value : STRING; tblProg : STRING; tblName : STRING) : BOOLEAN
+--Public Members
+
+ROUTINE hashPut
 VAR
 	entry : INTEGER
 BEGIN
@@ -129,7 +137,8 @@ BEGIN
 	RETURN(hPut(key, value, BYNAME(tblProg, tblName, entry)))
 END hashPut
 
-ROUTINE hashGet(key : STRING; tblProg : STRING; tblName : STRING) : STRING
+
+ROUTINE hashGet
 VAR
 	entry : INTEGER
 BEGIN
@@ -138,7 +147,7 @@ BEGIN
 	RETURN (hGet(key, BYNAME(tblProg, tblName, entry)))
 END hashGet
 
-ROUTINE hashDel(key : STRING; tblProg : STRING; tblName : STRING) : BOOLEAN
+ROUTINE hashDel
 VAR
 	entry : INTEGER
 BEGIN
@@ -146,7 +155,3 @@ BEGIN
 
 	RETURN (hDel(key, BYNAME(tblProg, tblName, entry)))
 END hashDel
-
-
-BEGIN
-END hash
