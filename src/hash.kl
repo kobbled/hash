@@ -119,6 +119,7 @@ BEGIN
 	IF index > 0 THEN
 		IF ((tbl[index].key=key)) THEN
 			tbl[index].key = ''
+      tbl[index].val = ''
 			RETURN(TRUE)
 		ENDIF
 	ENDIF
