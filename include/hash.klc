@@ -1,14 +1,30 @@
-PROGRAM hash
+PROGRAM class_name
 %NOLOCKGROUP
+%COMMENT = 'hash class'
 
-%INCLUDE hash.klt
+%include namespace.m
 
-%INCLUDE strings.klh
-%INCLUDE hash.private.klh
-%INCLUDE hash.klh
+-- declare type
+%include define_type.m
+t_hash(hashname,hval_def,class_name)
 
-BEGIN
-END hash
+%include hashclass.klh
+%include hashclass.private.klh
+%include strings.klh
+
+--define local classes
+-- ********************
+%defeval djb2 classfunc(djb2)
+%defeval jsStrHash classfunc(jStr)
+%defeval hModHash classfunc(hMod)
+%defeval hGetIndex classfunc(hGti)
+%defeval hPut classfunc(hPut)
+%defeval hGet classfunc(hGet)
+%defeval hDel classfunc(hDel)
+%defeval hashPut classfunc(put)
+%defeval hashGet classfunc(get)
+%defeval hashDel classfunc(del)
+-- ********************
 
 --Private Members
 
@@ -156,3 +172,6 @@ BEGIN
 
 	RETURN (hDel(key, BYNAME(tblProg, tblName, entry)))
 END hashDel
+
+BEGIN
+END class_name

@@ -1,0 +1,21 @@
+--header
+%include header_guard.m
+--oop
+%include namespace.m
+
+--start header file
+header_if -- ifndef class
+header_def -- define class
+
+
+-- namespaced members in format <class_name>__<func_name>
+declare(class_name,put,class_name,put)
+declare(class_name,get,class_name,get)
+declare(class_name,delete,class_name,del)
+
+--public
+ROUTINE classfunc(put) (key : STRING; value : STRING; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
+ROUTINE classfunc(get) (key : STRING; tblProg : STRING; tblName : STRING) : STRING FROM class_name
+ROUTINE classfunc(del) (key : STRING; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
+
+%endif --end header

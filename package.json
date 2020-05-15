@@ -6,16 +6,16 @@
   "license" : "MIT",
   "author" : "onerobotics",
   "source" : [
-    "src/hash.kl"
   ],
   "tests" : [
-    "src/test/test_hash.kl"
+    "test/test_hash.kl"
   ],
   "includes" : [
     "include"
   ],
   "depends" : [
     "KUnit",
-    "Strings"
+    "Strings",
+    "ktransw-macros"
   ]
 }
