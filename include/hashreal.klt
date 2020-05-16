@@ -1,0 +1,8 @@
+%include define_type.m
+-- declare type
+-- hval_def is what you declare through t__hash
+-- hval_type is what you use in headers
+%defeval hashname h_real
+%defeval hval_def REAL
+%defeval hval_type REAL
+

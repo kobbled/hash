@@ -1,0 +1,18 @@
+%include define_type.m
+
+
+%mode push
+%mode string QQQ "`" "`" "\\"
+%define hash_type_define `TYPE
+  TYPETEST FROM tpe = STRUCTURE
+    id : INTEGER
+    name : STRING[12]
+    defected : BOOLEAN
+    weight : REAL
+  ENDSTRUCTURE`
+%mode pop
+
+--declare hash for TPEPROGRAMS
+%defeval hashname hashtyp
+%defeval hval_def TYPETEST
+%defeval hval_type TYPETEST

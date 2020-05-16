@@ -2,30 +2,92 @@ PROGRAM test_hash
 %NOLOCKGROUP
 
 -- ** TYPES **
+
+-- STRING
 %include hashstring.klt
 t_hash(hashname,hval_def,hashstr)
 
 VAR
 	smallTable : ARRAY[1] OF hashname
 	twoTable   : ARRAY[2] OF hashname
+  value      : hval_def
+
+-- REAL
+%include hashreal.klt
+t_hash(hashname,hval_def,hshreal)
+
+VAR
+	realTable : ARRAY[5] OF hashname
+  rval      : hval_def
+
+-- USER STRUCT
+%include hashtypetest.klt
+--print type found in hashtypetest.klt
+hash_type_define
+%undef hash_type_define
+
+t_hash(hashname,hval_def,hshtype)
+
+VAR
+	typeTable : ARRAY[5] OF hashname
+  typeval   : hval_def
 
 %include kunit.klh
 
 -- hashstr
 %class hashstr('hash.klc','hashclass_full.klh','hashstring.klt')
+%class hshreal('hash.klc','hashclass.klh','hashreal.klt')
+%class hshtype('hash.klc','hashclass.klh','hashtypetest.klt')
 
-ROUTINE clearTables
-VAR
-	i : INTEGER
-BEGIN
-	smallTable[1].key = ''
-	smallTable[1].val = ''
+-- real hash
+ROUTINE t_getstrval(id :STRING; prog_name : STRING; tbl_name : STRING) : STRING
+  VAR
+    b : BOOLEAN
+  BEGIN
+    b = hashstr__get(id, value, prog_name, tbl_name)
+    RETURN(value)
+  END t_getstrval
 
-	FOR i=1 TO 2 DO
-		twoTable[i].key = ''
-		twoTable[i].val = ''
-	ENDFOR
-END clearTables
+
+ROUTINE t_getrelval(id :STRING; prog_name : STRING; tbl_name : STRING) : REAL
+  VAR
+    b : BOOLEAN
+  BEGIN
+    b = hshreal__get(id, rval, prog_name, tbl_name)
+    RETURN(rval)
+  END t_getrelval
+
+-- type hash
+ROUTINE t_cleartype : BOOLEAN
+  VAR
+    empty : TYPETEST
+  BEGIN
+    empty.id = 0 ; empty.name = '' ; empty.defected = FALSE ; empty.weight = 0.0 ; 
+    RETURN(kunit_assert(hshtype__clear_table('test_hash', 'typeTable', empty)))
+  END t_cleartype
+
+
+ROUTINE t_puttype : BOOLEAN
+  VAR
+    b : BOOLEAN
+  BEGIN
+    typeval.id = 11111 ; typeval.name = 'office desk' ; typeval.defected = TRUE ; typeval.weight = 80.5 ;
+    b = hshtype__put('foo', typeval, 'test_hash', 'typeTable')
+
+    RETURN(kunit_assert(b))
+  END t_puttype
+
+
+ROUTINE t_gettype : BOOLEAN
+  VAR
+    b : BOOLEAN
+  BEGIN
+    b = hshtype__get('foo', typeval, 'test_hash', 'typeTable')
+
+    RETURN(kunit_assert(b) AND kunit_eq_str('office desk', typeval.name) &
+           AND kunit_assert(typeval.defected) AND kunit_eq_r(80.5,typeval.weight))
+  END t_gettype
+
 
 BEGIN
 	kunit_test('djb2("a")', kunit_eq_int(177670, hashstr__djb2('a')))
@@ -37,25 +99,28 @@ BEGIN
 	kunit_test('jsStrHash("asdf")', kunit_eq_int(3003444, hashstr__jsStr('asdf')))
 	kunit_test('jsStrHash("a really really really long string")', kunit_eq_int(1765648255, hashstr__jsStr('a really really really long string')))
 
-	clearTables
-	kunit_test('hashGet with empty table returns empty string', kunit_eq_str('', hashstr__get('foo', 'test_hash', 'smallTable')))
+
+  kunit_test('Clear Table 1', kunit_assert(hashstr__clear_table('test_hash', 'smallTable', '')))
+  kunit_test('Clear Table 2', kunit_assert(hashstr__clear_table('test_hash', 'twoTable', '')))
+
+	kunit_test('hashGet with empty table returns uninit', kunit_assert(NOT(hashstr__get('foo', value, 'test_hash', 'smallTable'))))
 	kunit_test('hashDel with empty string returns false', kunit_assert(NOT(hashstr__delete('', 'test_hash', 'smallTable'))))
 	kunit_test('hashPut with empty string returns false', kunit_assert(NOT(hashstr__put('', 'foo', 'test_hash', 'smallTable'))))
-	kunit_test('hashGet with empty string returns empty string', kunit_eq_str('', hashstr__get('', 'test_hash', 'smallTable')))
+	kunit_test('hashGet with empty string returns uninit', kunit_assert(NOT(hashstr__get('', value, 'test_hash', 'smallTable'))))
 
 
 	kunit_test('put returns true', kunit_assert(hashstr__put('foo', 'bar', 'test_hash', 'smallTable')))
-	kunit_test('hashPut puts a value', kunit_eq_str('bar', hashstr__get('foo', 'test_hash', 'smallTable')))
+	kunit_test('hashPut puts a value', kunit_eq_str('bar', t_getstrval('foo', 'test_hash', 'smallTable')))
 
 	kunit_test('put works', kunit_assert(hashstr__put('foo', 'baz', 'test_hash', 'smallTable')))
-	kunit_test('hashPut overwrites', kunit_eq_str('baz', hashstr__get('foo', 'test_hash', 'smallTable')))
+	kunit_test('hashPut overwrites', kunit_eq_str('baz', t_getstrval('foo', 'test_hash', 'smallTable')))
 
 	-- can't put this... table full
 	kunit_test('put returns false when full', NOT(kunit_assert(hashstr__put('bar', 'foo', 'test_hash', 'smallTable'))))
-	kunit_test('hashPut does not put if tbl full', kunit_eq_str('', hashstr__get('bar', 'test_hash', 'smallTable')))
+	kunit_test('hashPut does not put if tbl full', kunit_assert(NOT(hashstr__get('bar', value, 'test_hash', 'smallTable'))))
 
 	kunit_test('hashDel returns true if it deletes key', kunit_assert(hashstr__delete('foo', 'test_hash', 'smallTable')))
-	kunit_test('hashDel actually deletes', kunit_eq_str('', hashstr__get('foo', 'test_hash', 'smallTable')))
+	kunit_test('hashDel actually deletes', kunit_assert(NOT (hashstr__get('foo', value, 'test_hash', 'smallTable'))))
 	kunit_test('hashDel returns false if it cannot find the key', NOT(kunit_assert(hashstr__delete('asdfasdf', 'test_hash', 'smallTable'))))
 
 	-- test collisions
@@ -65,6 +130,18 @@ BEGIN
 	kunit_test('index of c is 2 normally', kunit_eq_int(2, hashstr__hGetIndex('c', false, twoTable)))
 	kunit_test('put a', kunit_assert(hashstr__put('a', 'foo', 'test_hash', 'twoTable')))
 	kunit_test('index of c is 1 if 2 is full', kunit_eq_int(1, hashstr__hGetIndex('c', false, twoTable)))
+
+  --test hash table of reals
+  kunit_test('Clear real table', kunit_assert(hshreal__clear_table('test_hash', 'realTable', 0.0)))
+  kunit_test('put reals', kunit_assert(hshreal__put('bar', 5.5, 'test_hash', 'realTable')) )
+  kunit_test('get real', kunit_eq_r(5.5, t_getrelval('bar', 'test_hash', 'realTable')) )
+  kunit_test('delete real', kunit_assert(hshreal__delete('bar', 'test_hash', 'realTable')) )
+  kunit_test('check that real is deleted', kunit_assert(NOT(hshreal__get('bar', rval, 'test_hash', 'realTable'))) )
+
+  --test hash of type TYPETEST
+  kunit_test('Clear type hash', t_cleartype)
+  kunit_test('put type data into hash', t_puttype)
+  kunit_test('get type data from hash', t_gettype)
 
 	kunit_done
 END test_hash
