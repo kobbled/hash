@@ -15,14 +15,16 @@ declare(class_name,hGetIndex,class_name,hGti)
 declare(class_name,hPut,class_name,hPut)
 declare(class_name,hGet,class_name,hGet)
 declare(class_name,hDel,class_name,hDel)
+declare(class_name,hClear,class_name,hClr)
 
---private (DO not use outside of has scope).
+--private
 ROUTINE classfunc(djb2) (str : STRING) : INTEGER FROM class_name
 ROUTINE classfunc(jStr) (str : STRING) : INTEGER FROM class_name
 ROUTINE classfunc(hMod) (key : STRING; len : INTEGER) : INTEGER FROM class_name
 ROUTINE classfunc(hGti) (key : STRING; get : BOOLEAN; tbl : ARRAY OF hashname) : INTEGER FROM class_name
 ROUTINE classfunc(hPut) (key : STRING; value : hval_type; tbl : ARRAY OF hashname) : BOOLEAN FROM class_name
-ROUTINE classfunc(hGet) (key : STRING; tbl : ARRAY OF hashname) : STRING FROM class_name
+ROUTINE classfunc(hGet) (key : STRING; out_val : hval_type; tbl : ARRAY OF hashname) : BOOLEAN FROM class_name
 ROUTINE classfunc(hDel) (key : STRING; tbl : ARRAY OF hashname) : BOOLEAN FROM class_name
+ROUTINE classfunc(hClr) (tbl : ARRAY OF hashname; clrData : hval_type) : BOOLEAN FROM class_name
 
 %endif --end header

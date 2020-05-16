@@ -6,6 +6,13 @@ PROGRAM class_name
 
 -- declare type
 %include define_type.m
+
+--print user defined struct
+%ifdef hash_type_define
+hash_type_define
+%endif
+
+--print hash struct
 t_hash(hashname,hval_def,class_name)
 
 %include hashclass.klh
@@ -21,9 +28,11 @@ t_hash(hashname,hval_def,class_name)
 %defeval hPut classfunc(hPut)
 %defeval hGet classfunc(hGet)
 %defeval hDel classfunc(hDel)
+%defeval hClear classfunc(hClr)
 %defeval hashPut classfunc(put)
 %defeval hashGet classfunc(get)
 %defeval hashDel classfunc(del)
+%defeval clear_table classfunc(clr)
 -- ********************
 
 --Private Members
@@ -118,30 +127,42 @@ END hPut
 ROUTINE hGet
 VAR
 	index : INTEGER
+  empty   : hval_def
 BEGIN
 	index = hGetIndex(key, true, tbl)
-	IF index > 0 THEN
-		RETURN(tbl[index].val)
-	ENDIF
-
-	RETURN('')
+  IF index = 0 THEN RETURN(FALSE); ENDIF
+	
+	out_val = tbl[index].val
+  RETURN(TRUE)
 END hGet
 
 ROUTINE hDel
 VAR
 	index : INTEGER
+  empty   : hval_def
 BEGIN
 	index = hGetIndex(key, true, tbl)
 	IF index > 0 THEN
 		IF ((tbl[index].key=key)) THEN
 			tbl[index].key = ''
-      tbl[index].val = ''
 			RETURN(TRUE)
 		ENDIF
 	ENDIF
 
 	RETURN(FALSE)
 END hDel
+
+ROUTINE hClear
+  VAR
+    i       : INTEGER
+  BEGIN
+    FOR i=1 TO ARRAY_LEN(tbl) DO
+      tbl[i].key = ''
+      tbl[i].val = clrData
+    ENDFOR
+
+    RETURN(TRUE)
+  END hClear
 
 --Public Members
 
@@ -158,10 +179,11 @@ END hashPut
 ROUTINE hashGet
 VAR
 	entry : INTEGER
+  empty   : hval_def
 BEGIN
-	IF (key='') THEN RETURN(''); ENDIF
-
-	RETURN (hGet(key, BYNAME(tblProg, tblName, entry)))
+	IF (key='') THEN RETURN(FALSE); ENDIF
+  
+	RETURN (hGet(key, out_val, BYNAME(tblProg, tblName, entry)))
 END hashGet
 
 ROUTINE hashDel
@@ -172,6 +194,13 @@ BEGIN
 
 	RETURN (hDel(key, BYNAME(tblProg, tblName, entry)))
 END hashDel
+
+ROUTINE clear_table
+  VAR
+	  entry : INTEGER
+  BEGIN
+    RETURN ( hClear(BYNAME(tblProg, tblName, entry), clrData) )
+  END clear_table
 
 BEGIN
 END class_name

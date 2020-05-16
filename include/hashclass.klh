@@ -12,10 +12,12 @@ header_def -- define class
 declare(class_name,put,class_name,put)
 declare(class_name,get,class_name,get)
 declare(class_name,delete,class_name,del)
+declare(class_name,clear_table,class_name,clr)
 
 --public
-ROUTINE classfunc(put) (key : STRING; value : STRING; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
-ROUTINE classfunc(get) (key : STRING; tblProg : STRING; tblName : STRING) : STRING FROM class_name
+ROUTINE classfunc(put) (key : STRING; value : hval_type; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
+ROUTINE classfunc(get) (key : STRING; out_val : hval_type; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
 ROUTINE classfunc(del) (key : STRING; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
+ROUTINE classfunc(clr) (tblProg : STRING; tblName : STRING; clrData : hval_type) : BOOLEAN FROM class_name
 
 %endif --end header
