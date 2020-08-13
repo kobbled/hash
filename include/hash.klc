@@ -19,22 +19,6 @@ t_hash(hashname,hval_def,class_name)
 %include hashclass.private.klh
 %include strings.klh
 
---define local classes
--- ********************
-%defeval djb2 classfunc(djb2)
-%defeval jsStrHash classfunc(jStr)
-%defeval hModHash classfunc(hMod)
-%defeval hGetIndex classfunc(hGti)
-%defeval hPut classfunc(hPut)
-%defeval hGet classfunc(hGet)
-%defeval hDel classfunc(hDel)
-%defeval hClear classfunc(hClr)
-%defeval hashPut classfunc(put)
-%defeval hashGet classfunc(get)
-%defeval hashDel classfunc(del)
-%defeval clear_table classfunc(clr)
--- ********************
-
 --Private Members
 
 ROUTINE djb2
@@ -52,7 +36,7 @@ BEGIN
 END djb2
 
 -- From Java 1.5 string library
-ROUTINE jsStrHash
+ROUTINE jsStr
 VAR
 	hash : INTEGER
 	i    : INTEGER
@@ -62,15 +46,15 @@ BEGIN
 		hash = (31 * hash) + ord(str, i)
 	ENDFOR
 	RETURN(hash)
-END jsStrHash
+END jsStr
 
-ROUTINE hModHash
+ROUTINE hMod
 VAR
 	hash : INTEGER
 BEGIN
-	hash = jsStrHash(key)
+	hash = jsStr(key)
 	RETURN(hash MOD len + 1)
-END hModHash
+END hMod
 
 ROUTINE hGetIndex
 VAR
@@ -79,7 +63,7 @@ VAR
 	index     : INTEGER
 	count     : INTEGER
 BEGIN
-	hash = jsStrHash(key)
+	hash = jsStr(key)
 	tblLength = ARRAY_LEN(tbl)
 	index = hash MOD tblLength + 1
 
@@ -166,17 +150,17 @@ ROUTINE hClear
 
 --Public Members
 
-ROUTINE hashPut
+ROUTINE put
 VAR
 	entry : INTEGER
 BEGIN
 	IF (key='') THEN RETURN(FALSE); ENDIF
 
 	RETURN(hPut(key, value, BYNAME(tblProg, tblName, entry)))
-END hashPut
+END put
 
 
-ROUTINE hashGet
+ROUTINE get
 VAR
 	entry : INTEGER
   empty   : hval_def
@@ -184,16 +168,16 @@ BEGIN
 	IF (key='') THEN RETURN(FALSE); ENDIF
   
 	RETURN (hGet(key, out_val, BYNAME(tblProg, tblName, entry)))
-END hashGet
+END get
 
-ROUTINE hashDel
+ROUTINE delete
 VAR
 	entry : INTEGER
 BEGIN
 	IF (key='') THEN RETURN(FALSE); ENDIF
 
 	RETURN (hDel(key, BYNAME(tblProg, tblName, entry)))
-END hashDel
+END delete
 
 ROUTINE clear_table
   VAR

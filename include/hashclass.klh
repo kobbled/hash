@@ -7,17 +7,14 @@
 header_if -- ifndef class
 header_def -- define class
 
-
--- namespaced members in format <class_name>__<func_name>
-declare(class_name,put,class_name,put)
-declare(class_name,get,class_name,get)
-declare(class_name,delete,class_name,del)
-declare(class_name,clear_table,class_name,clr)
-
 --public
-ROUTINE classfunc(put) (key : STRING; value : hval_type; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
-ROUTINE classfunc(get) (key : STRING; out_val : hval_type; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
-ROUTINE classfunc(del) (key : STRING; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
-ROUTINE classfunc(clr) (tblProg : STRING; tblName : STRING; clrData : hval_type) : BOOLEAN FROM class_name
+declare_member(class_name,put,class_name,put)
+ROUTINE put (key : STRING; value : hval_type; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
+declare_member(class_name,get,class_name,get)
+ROUTINE get (key : STRING; out_val : hval_type; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
+declare_member(class_name,delete,class_name,del)
+ROUTINE delete (key : STRING; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
+declare_member(class_name,clear_table,class_name,clr)
+ROUTINE clear_table (tblProg : STRING; tblName : STRING; clrData : hval_type) : BOOLEAN FROM class_name
 
 %endif --end header

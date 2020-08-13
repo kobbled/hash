@@ -7,24 +7,22 @@
 header_private_if -- ifndef class
 header_private_def -- define class
 
--- namespaced members in format <class_name>__<func_name>
-declare(class_name,djb2,class_name,djb2)
-declare(class_name,jsStr,class_name,jStr)
-declare(class_name,hMod,class_name,hMod)
-declare(class_name,hGetIndex,class_name,hGti)
-declare(class_name,hPut,class_name,hPut)
-declare(class_name,hGet,class_name,hGet)
-declare(class_name,hDel,class_name,hDel)
-declare(class_name,hClear,class_name,hClr)
-
 --private
-ROUTINE classfunc(djb2) (str : STRING) : INTEGER FROM class_name
-ROUTINE classfunc(jStr) (str : STRING) : INTEGER FROM class_name
-ROUTINE classfunc(hMod) (key : STRING; len : INTEGER) : INTEGER FROM class_name
-ROUTINE classfunc(hGti) (key : STRING; get : BOOLEAN; tbl : ARRAY OF hashname) : INTEGER FROM class_name
-ROUTINE classfunc(hPut) (key : STRING; value : hval_type; tbl : ARRAY OF hashname) : BOOLEAN FROM class_name
-ROUTINE classfunc(hGet) (key : STRING; out_val : hval_type; tbl : ARRAY OF hashname) : BOOLEAN FROM class_name
-ROUTINE classfunc(hDel) (key : STRING; tbl : ARRAY OF hashname) : BOOLEAN FROM class_name
-ROUTINE classfunc(hClr) (tbl : ARRAY OF hashname; clrData : hval_type) : BOOLEAN FROM class_name
+declare_member(class_name,djb2,class_name,djb2)
+ROUTINE djb2 (str : STRING) : INTEGER FROM class_name
+declare_member(class_name,jsStr,class_name,jStr)
+ROUTINE jsStr (str : STRING) : INTEGER FROM class_name
+declare_member(class_name,hMod,class_name,hMod)
+ROUTINE hMod (key : STRING; len : INTEGER) : INTEGER FROM class_name
+declare_member(class_name,hGetIndex,class_name,hGti)
+ROUTINE hGetIndex (key : STRING; get : BOOLEAN; tbl : ARRAY OF hashname) : INTEGER FROM class_name
+declare_member(class_name,hPut,class_name,hPut)
+ROUTINE hPut (key : STRING; value : hval_type; tbl : ARRAY OF hashname) : BOOLEAN FROM class_name
+declare_member(class_name,hGet,class_name,hGet)
+ROUTINE hGet (key : STRING; out_val : hval_type; tbl : ARRAY OF hashname) : BOOLEAN FROM class_name
+declare_member(class_name,hDel,class_name,hDel)
+ROUTINE hDel (key : STRING; tbl : ARRAY OF hashname) : BOOLEAN FROM class_name
+declare_member(class_name,hClear,class_name,hClr)
+ROUTINE hClear (tbl : ARRAY OF hashname; clrData : hval_type) : BOOLEAN FROM class_name
 
 %endif --end header

@@ -9,37 +9,32 @@
 header_if -- ifndef class
 header_def -- define class
 
-
--- namespaced members in format <class_name>__<func_name>
-declare(class_name,put,class_name,put)
-declare(class_name,get,class_name,get)
-declare(class_name,delete,class_name,del)
-declare(class_name,clear_table,class_name,clr)
-
 --public
-ROUTINE classfunc(put) (key : STRING; value : hval_type; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
-ROUTINE classfunc(get) (key : STRING; out_val : hval_type; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
-ROUTINE classfunc(del) (key : STRING; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
-ROUTINE classfunc(clr) (tblProg : STRING; tblName : STRING; clrData : hval_type) : BOOLEAN FROM class_name
-
--- namespaced members in format <class_name>__<func_name>
-declare(class_name,djb2,class_name,djb2)
-declare(class_name,jsStr,class_name,jStr)
-declare(class_name,hMod,class_name,hMod)
-declare(class_name,hGetIndex,class_name,hGti)
-declare(class_name,hPut,class_name,hPut)
-declare(class_name,hGet,class_name,hGet)
-declare(class_name,hDel,class_name,hDel)
-declare(class_name,hClear,class_name,hClr)
+declare_member(class_name,put,class_name,put)
+ROUTINE put (key : STRING; value : hval_type; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
+declare_member(class_name,get,class_name,get)
+ROUTINE get (key : STRING; out_val : hval_type; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
+declare_member(class_name,delete,class_name,del)
+ROUTINE delete (key : STRING; tblProg : STRING; tblName : STRING) : BOOLEAN FROM class_name
+declare_member(class_name,clear_table,class_name,clr)
+ROUTINE clear_table (tblProg : STRING; tblName : STRING; clrData : hval_type) : BOOLEAN FROM class_name
 
 --private (DO not use outside of has scope).
-ROUTINE classfunc(djb2) (str : STRING) : INTEGER FROM class_name
-ROUTINE classfunc(jStr) (str : STRING) : INTEGER FROM class_name
-ROUTINE classfunc(hMod) (key : STRING; len : INTEGER) : INTEGER FROM class_name
-ROUTINE classfunc(hGti) (key : STRING; get : BOOLEAN; tbl : ARRAY OF hashname) : INTEGER FROM class_name
-ROUTINE classfunc(hPut) (key : STRING; value : hval_type; tbl : ARRAY OF hashname) : BOOLEAN FROM class_name
-ROUTINE classfunc(hGet) (key : STRING; out_val : hval_type; tbl : ARRAY OF hashname) : BOOLEAN FROM class_name
-ROUTINE classfunc(hDel) (key : STRING; tbl : ARRAY OF hashname) : BOOLEAN FROM class_name
-ROUTINE classfunc(hClr) (tbl : ARRAY OF hashname; clrData : hval_type) : BOOLEAN FROM class_name
+declare_member(class_name,djb2,class_name,djb2)
+ROUTINE djb2 (str : STRING) : INTEGER FROM class_name
+declare_member(class_name,jsStr,class_name,jStr)
+ROUTINE jsStr (str : STRING) : INTEGER FROM class_name
+declare_member(class_name,hMod,class_name,hMod)
+ROUTINE hMod (key : STRING; len : INTEGER) : INTEGER FROM class_name
+declare_member(class_name,hGetIndex,class_name,hGti)
+ROUTINE hGetIndex (key : STRING; get : BOOLEAN; tbl : ARRAY OF hashname) : INTEGER FROM class_name
+declare_member(class_name,hPut,class_name,hPut)
+ROUTINE hPut (key : STRING; value : hval_type; tbl : ARRAY OF hashname) : BOOLEAN FROM class_name
+declare_member(class_name,hGet,class_name,hGet)
+ROUTINE hGet (key : STRING; out_val : hval_type; tbl : ARRAY OF hashname) : BOOLEAN FROM class_name
+declare_member(class_name,hDel,class_name,hDel)
+ROUTINE hDel (key : STRING; tbl : ARRAY OF hashname) : BOOLEAN FROM class_name
+declare_member(class_name,hClear,class_name,hClr)
+ROUTINE hClear (tbl : ARRAY OF hashname; clrData : hval_type) : BOOLEAN FROM class_name
 
 %endif --end header
