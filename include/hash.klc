@@ -17,7 +17,6 @@ t_hash(hashname,hval_def,class_name)
 
 %include hashclass.klh
 %include hashclass.private.klh
-%include strings.klh
 
 --Private Members
 
