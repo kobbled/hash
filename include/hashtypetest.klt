@@ -3,8 +3,8 @@
 
 %mode push
 %mode string QQQ "`" "`" "\\"
-%define hash_type_define `TYPE
-  TYPETEST FROM tpe = STRUCTURE
+%define hash_type_define(obj_name) `TYPE
+  TYPETEST FROM obj_name = STRUCTURE
     id : INTEGER
     name : STRING[12]
     defected : BOOLEAN
@@ -13,6 +13,6 @@
 %mode pop
 
 --declare hash for TPEPROGRAMS
-%defeval hashname hashtyp
+%defeval hashname h_typ
 %defeval hval_def TYPETEST
 %defeval hval_type TYPETEST

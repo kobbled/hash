@@ -1,4 +1,4 @@
 bin/
 *.swp
-robot.ini
+*robot.ini
 build/

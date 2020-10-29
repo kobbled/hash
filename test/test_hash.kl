@@ -23,7 +23,7 @@ VAR
 -- USER STRUCT
 %include hashtypetest.klt
 --print type found in hashtypetest.klt
-hash_type_define
+hash_type_define(hshtype)
 %undef hash_type_define
 
 t_hash(hashname,hval_def,hshtype)

@@ -9,7 +9,7 @@ PROGRAM class_name
 
 --print user defined struct
 %ifdef hash_type_define
-hash_type_define
+hash_type_define(class_name)
 %endif
 
 --print hash struct
