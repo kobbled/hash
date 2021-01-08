@@ -1,0 +1,36 @@
+--header
+%include header_guard.m
+--oop
+%include namespace.m
+
+--start header file
+header_private_if -- ifndef class
+header_private_def -- define class
+
+--private
+declare_member(class_name,clear,class_name,clr)
+ROUTINE clear(tbl : PATH pathheader = t_linear_hsh, nodedata = hashname) FROM class_name
+declare_member(class_name,jsStr,class_name,jStr)
+ROUTINE jsStr(str : STRING) : INTEGER FROM class_name
+declare_member(class_name,hMod,class_name,hMod)
+ROUTINE hMod(hash : INTEGER; bit_shift : INTEGER) : INTEGER FROM class_name
+declare_member(class_name,expandOccupancy,class_name,expo)
+ROUTINE expandOccupancy(tbl : PATH pathheader = t_linear_hsh, nodedata = hashname) : BOOLEAN FROM class_name
+declare_member(class_name,shrinkOccupancy,class_name,srko)
+ROUTINE shrinkOccupancy(tbl : PATH pathheader = t_linear_hsh, nodedata = hashname) : BOOLEAN FROM class_name
+declare_member(class_name,rehash,class_name,rhsh)
+ROUTINE rehash(grow_shrink : BOOLEAN ; tbl : PATH pathheader = t_linear_hsh, nodedata = hashname) FROM class_name
+declare_member(class_name,expand,class_name,expd)
+ROUTINE expand(tbl : PATH pathheader = t_linear_hsh, nodedata = hashname) FROM class_name
+declare_member(class_name,shrink,class_name,srnk)
+ROUTINE shrink(tbl : PATH pathheader = t_linear_hsh, nodedata = hashname) FROM class_name
+declare_member(class_name,hGetIndex,class_name,hGti)
+ROUTINE hGetIndex(key : STRING; tbl : PATH pathheader = t_linear_hsh, nodedata = hashname) : INTEGER FROM class_name
+declare_member(class_name,hEmptyIndex,class_name,hmti)
+ROUTINE hEmptyIndex(hash : INTEGER; tbl : PATH pathheader = t_linear_hsh, nodedata = hashname) : INTEGER FROM class_name
+declare_member(class_name,hEmpty,class_name,hmty)
+ROUTINE hEmpty(key : STRING; out_val : hval_type; tbl : PATH pathheader = t_linear_hsh, nodedata = hashname) : BOOLEAN FROM class_name
+declare_member(class_name,hPutIndex,class_name,hPti)
+ROUTINE hPutIndex(key : STRING; tbl : PATH pathheader = t_linear_hsh, nodedata = hashname) : INTEGER FROM class_name
+
+%endif --end header

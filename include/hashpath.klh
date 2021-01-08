@@ -1,0 +1,25 @@
+--header
+%include header_guard.m
+--oop
+%include namespace.m
+
+--start header file
+header_if -- ifndef class
+header_def -- define class
+
+--public
+declare_member(class_name,init,class_name,init)
+ROUTINE init(tbl : PATH pathheader = t_linear_hsh, nodedata = hashname) FROM class_name
+declare_member(class_name,destructor,class_name,dest)
+ROUTINE destructor(tbl : PATH pathheader = t_linear_hsh, nodedata = hashname) FROM class_name
+
+declare_member(class_name,put,class_name,put)
+ROUTINE put(key : STRING; value : hval_type; &
+              tbl : PATH pathheader = t_linear_hsh, nodedata = hashname) : BOOLEAN FROM class_name
+declare_member(class_name,get,class_name,get)
+ROUTINE get(key : STRING; out_val : hval_type; &
+              tbl : PATH pathheader = t_linear_hsh, nodedata = hashname) : BOOLEAN FROM class_name
+declare_member(class_name,delete,class_name,del)
+ROUTINE delete(key : STRING; tbl : PATH pathheader = t_linear_hsh, nodedata = hashname) : BOOLEAN FROM class_name
+
+%endif --end header

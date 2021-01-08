@@ -4,11 +4,11 @@
   "description" : "",
   "version" : "0.0.1",
   "license" : "MIT",
-  "author" : "onerobotics",
+  "author" : "onerobotics/kobbled",
   "source" : [
   ],
   "tests" : [
-    "test/test_hash.kl"
+    "test/test_pathhsh.kl"
   ],
   "includes" : [
     "include",
@@ -16,6 +16,8 @@
   ],
   "depends" : [
     "KUnit",
+    "errors",
+    "math",
     "Strings",
     "ktransw-macros"
   ]

@@ -1,0 +1,90 @@
+PROGRAM test_pathhsh
+%NOLOCKGROUP
+
+-- declare type
+%include define_type.m
+
+--define path header
+%include hashpath.klt
+hashpath_type_define(hshint)
+
+-- INTEGER hash
+%include hashint.klt
+t_hash(hashname,hval_def,hshint)
+
+VAR
+  hash1 : PATH pathheader = t_linear_hsh, nodedata = hashname
+  value      : hval_def
+
+%include kunit.klh
+
+--hash objects
+%class hshint('hashpath.klc','hashpath.klh','hashint.klt')
+
+
+ROUTINE t_put_expand : BOOLEAN
+  VAR
+    namarr : ARRAY[10] OF STRING[12]
+    valarr : ARRAY[10] OF INTEGER
+    put_b : ARRAY[10] OF BOOLEAN
+    get_b : ARRAY[10] OF BOOLEAN
+    get_v : ARRAY[10] OF INTEGER
+  BEGIN
+
+    namarr[1] = 'one' ;   valarr[1] = 10 ; 
+    namarr[2] = 'two' ;   valarr[2] = 3 ; 
+    namarr[3] = 'three' ; valarr[3] = 15 ; 
+    namarr[4] = 'four' ;  valarr[4] = 20 ; 
+    namarr[5] = 'five' ;  valarr[5] = 8 ;
+    namarr[6] = 'six' ;   valarr[6] = 12 ;
+    namarr[7] = 'seven' ; valarr[7] = 20 ;
+    namarr[8] = 'eight' ; valarr[8] = 6 ;
+    namarr[9] = 'nine' ;  valarr[9] = 18 ;
+    namarr[10] = 'ten' ;  valarr[10] = 2 ;
+
+    --initialize hash
+    hshint__init(hash1)
+
+    -- put
+    put_b[1] = hshint__put(namarr[1], valarr[1], hash1)
+    put_b[2] = hshint__put(namarr[2], valarr[2], hash1)
+    put_b[3] = hshint__put(namarr[3], valarr[3], hash1)
+
+    --get 
+    get_b[1] = hshint__get(namarr[1], get_v[1], hash1)
+    get_b[2] = hshint__get(namarr[2], get_v[2], hash1)
+    get_b[3] = hshint__get(namarr[3], get_v[3], hash1)
+    
+    --put
+    put_b[4] = hshint__put(namarr[4], valarr[4], hash1)
+    put_b[5] = hshint__put(namarr[5], valarr[5], hash1)
+    put_b[6] = hshint__put(namarr[6], valarr[6], hash1)
+
+    --get 
+    get_b[4] = hshint__get(namarr[4], get_v[4], hash1)
+    get_b[5] = hshint__get(namarr[5], get_v[5], hash1)
+    get_b[6] = hshint__get(namarr[6], get_v[6], hash1)
+
+    --put
+    put_b[7] = hshint__put(namarr[7], valarr[7], hash1)
+    put_b[8] = hshint__put(namarr[8], valarr[8], hash1)
+    put_b[9] = hshint__put(namarr[9], valarr[9], hash1)
+    put_b[10] = hshint__put(namarr[10], valarr[10], hash1)
+
+    --get
+    get_b[7] = hshint__get(namarr[7], get_v[7], hash1)
+    get_b[8] = hshint__get(namarr[8], get_v[8], hash1)
+    get_b[9] = hshint__get(namarr[9], get_v[9], hash1)
+    get_b[10] = hshint__get(namarr[10], get_v[10], hash1)
+
+    RETURN(kunit_eq_arb(put_b) AND kunit_eq_ari(valarr, get_v))
+  END t_put_expand
+
+
+BEGIN
+  kunit_test('expanding hash', t_put_expand) --asserts 11
+  kunit_done
+
+  --destruct classes
+  hshint__destructor(hash1)
+END test_pathhsh

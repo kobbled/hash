@@ -1,0 +1,412 @@
+PROGRAM class_name
+%NOLOCKGROUP
+%COMMENT = 'linear hashing'
+
+-- adapted linear hashing method
+-- (*ref : http://www.mathcs.emory.edu/~cheung/Courses/554/Syllabus/3-index/linear-hashing-new2.html)
+
+%define DEBUG_BUILD FALSE
+
+%include namespace.m
+
+-- declare type
+%include define_type.m
+
+%include errors.klt
+
+--print user defined struct
+%ifdef hash_type_define
+hash_type_define(class_name)
+%endif
+--print hash struct
+t_hash(hashname,hval_def,class_name)
+
+--define path header
+%include hashpath.klt
+hashpath_type_define(class_name)
+
+--VARS
+
+%include errors.klh
+%include math.klh
+
+%include hashpath.klh
+%include hashpath.private.klh
+
+--Private Members
+
+ROUTINE clear
+  VAR
+    i : INTEGER
+    status : INTEGER
+  BEGIN
+    i = PATH_LEN(tbl)
+    WHILE PATH_LEN(tbl) > 0 DO
+		  DELETE_NODE(tbl,i,status)
+      CHK_STAT(status)
+      i = i - 1
+	  ENDWHILE
+  END clear
+
+-- From Java 1.5 string library
+ROUTINE jsStr
+  VAR
+    hash : INTEGER
+    i    : INTEGER
+  BEGIN
+    hash = 0
+    FOR i=1 TO STR_LEN(str) DO
+      hash = (31 * hash) + ord(str, i)
+    ENDFOR
+    RETURN(hash)
+  END jsStr
+
+ROUTINE hMod
+  BEGIN
+    RETURN((hash MOD TRUNC(math__pow(2, (bit_shift))) + 1) )
+  END hMod
+
+ROUTINE expandOccupancy
+  BEGIN
+    --check condition to expand the table
+    IF tbl.occupancy > MAX_OCCUPANCY THEN
+      RETURN(TRUE)
+    ENDIF
+
+    RETURN(FALSE)
+  END expandOccupancy
+
+ROUTINE shrinkOccupancy
+  BEGIN
+    --check if occupancy is < MAX_OCCUPANCY
+    --of the previous size
+    IF tbl.n/math__pow(2, (tbl.i - 1)) < MAX_OCCUPANCY THEN
+      RETURN(TRUE)
+    ENDIF
+
+    RETURN(FALSE)
+  END shrinkOccupancy
+
+ROUTINE rehash
+  VAR
+    i, new_i : INTEGER
+    hash : INTEGER
+    remap_i : INTEGER
+    remap_b : BOOLEAN
+    curr_size, last_size, prev_oc : INTEGER
+    uninit_kv : hashname
+  BEGIN
+    --previous size of table
+    curr_size = TRUNC(math__pow(2, (tbl.i)))
+    IF grow_shrink THEN
+      last_size = TRUNC(math__pow(2, (tbl.i-1)))
+    ELSE
+      last_size = TRUNC(math__pow(2, (tbl.i+1)))
+    ENDIF
+    --previous occupancy
+    prev_oc = tbl.n
+    
+    FOR i=1 TO last_size DO
+      IF NOT UNINIT(tbl[i].key) THEN 
+        IF tbl[i].key <> '' THEN
+          hash = jsStr(tbl[i].key)
+          new_i = hMod(hash, tbl.i)
+
+          --If index is greater than last table size
+          --it needs to be remapped
+          remap_b = FALSE
+          IF grow_shrink AND (new_i > last_size) THEN
+            remap_b = TRUE
+          ENDIF
+          --If shinking hashes remap old hashes greater than
+          --new hash size
+          IF (NOT grow_shrink) AND (hMod(hash, tbl.i+1) > curr_size) THEN
+            remap_b = TRUE
+          ENDIF
+
+          IF remap_b THEN
+            remap_i = hPutIndex(tbl[i].key, tbl)
+
+%ifeq DEBUG_BUILD TRUE
+            WRITE TPDISPLAY(CR, 'remap ', tbl[i].key, ' to ', remap_i)
+%endif
+    
+            IF remap_i > 0 THEN
+              --map to new index
+              tbl[remap_i].key = tbl[i].key
+              tbl[remap_i].val = tbl[i].val
+              --uninitialize old value
+              tbl[i] = uninit_kv
+            ELSE
+              karelError(INVALID_INDEX,'could not remap ' + tbl[remap_i].key + 'in class_name', ER_ABORT)
+            ENDIF
+
+          ENDIF
+
+        ENDIF
+      ENDIF
+    ENDFOR
+
+    --do not increase occupancy as we are only reorganizing
+    tbl.n = prev_oc
+  END rehash
+
+ROUTINE expand
+  VAR
+    i : INTEGER
+    new_bins : INTEGER
+    status : INTEGER
+  BEGIN
+    -- increase hash table size
+    new_bins = TRUNC(math__pow(2, (tbl.i + 1))) - PATH_LEN(tbl)
+    FOR i=1 TO new_bins DO
+      APPEND_NODE(tbl,status)
+      CHK_STAT(status)
+    ENDFOR
+
+    tbl.i = tbl.i + 1
+    --rehash items
+    rehash(TRUE, tbl)
+
+  END expand
+
+ROUTINE shrink
+  VAR
+    i : INTEGER
+    del_bins : INTEGER
+    status : INTEGER
+  BEGIN
+
+    tbl.i = tbl.i - 1
+
+    --remap to lower size
+    rehash(FALSE, tbl)
+
+    -- decrease hash table size
+    del_bins = PATH_LEN(tbl) - TRUNC(math__pow(2, (tbl.i - 1)))
+
+    FOR i=PATH_LEN(tbl) DOWNTO del_bins DO
+      DELETE_NODE(tbl,i,status)
+      CHK_STAT(status)
+    ENDFOR
+
+  END shrink
+
+ROUTINE hGetIndex
+  VAR
+    hash      : INTEGER
+    index     : INTEGER
+    count     : INTEGER
+  BEGIN
+    hash = jsStr(key)
+    index = hMod(hash, tbl.i)
+
+    FOR count=0 TO PATH_LEN(tbl)-1 DO
+      IF UNINIT(tbl[index].key) THEN tbl[index].key = ''; ENDIF
+
+      -- get requests require key=key
+      IF ((tbl[index].key=key)) THEN
+        RETURN(index)
+      ENDIF
+
+      --increment index continually
+      index = ((index+1-1) MOD PATH_LEN(tbl)) + 1
+    ENDFOR
+
+    -- did not find index
+    RETURN(0)
+  END hGetIndex
+
+ROUTINE hEmptyIndex
+  VAR
+    index     : INTEGER
+    count     : INTEGER
+  BEGIN
+    index = hMod(hash, tbl.i)
+    FOR count=0 TO PATH_LEN(tbl)-1 DO
+
+      IF UNINIT(tbl[index].key) THEN tbl[index].key = ''; ENDIF
+      --find the next free bucket
+      IF (tbl[index].key='') THEN
+        --increase bin occupancy
+        tbl.n = tbl.n + 1
+        RETURN(index)
+      ENDIF
+      --increment index continually
+      index = ((index+1-1) MOD PATH_LEN(tbl)) + 1
+    ENDFOR
+
+    -- did not find index
+	  RETURN(0)
+  END hEmptyIndex
+
+ROUTINE hEmpty
+  VAR
+    index : INTEGER
+    hash : INTEGER
+  BEGIN
+    hash = jsStr(key)
+    index = hEmptyIndex(hash, tbl)
+
+%ifeq DEBUG_BUILD TRUE
+    WRITE TPDISPLAY(CR, 'move hsh: ', key, ' idx: ', index)
+%endif
+
+    IF index > 0 THEN
+      --remap collision
+      tbl[index].key = key
+      tbl[index].val = out_val
+      RETURN(TRUE)
+    ENDIF
+
+    RETURN(FALSE)
+  END hEmpty
+
+ROUTINE hPutIndex
+  VAR
+    hash      : INTEGER
+    col_hash : INTEGER
+    nxt_rehash : INTEGER
+    index, index2    : INTEGER
+  BEGIN
+    hash = jsStr(key)
+    index = hMod(hash, tbl.i)
+
+    IF UNINIT(tbl[index].key) THEN tbl[index].key = ''; ENDIF
+
+    -- put requests require key=key or empty
+    IF (tbl[index].key='') THEN
+  
+%ifeq DEBUG_BUILD TRUE
+      WRITE TPDISPLAY(CR, 'hsh: ', key, ' idx: ', index)
+%endif
+
+      --increase bin occupancy
+      tbl.n = tbl.n + 1
+      RETURN(index)
+    ENDIF
+    IF (tbl[index].key=key) THEN
+      RETURN(index)
+    ELSE
+      --if collision determine which key will change bin number first
+      -- during expansion
+      col_hash = jsStr(tbl[index].key)
+      nxt_rehash = tbl.i
+      REPEAT
+        nxt_rehash = nxt_rehash + 1
+      UNTIL(hMod(hash, nxt_rehash) <> hMod(col_hash, nxt_rehash))
+
+      --if collision changes first find another bucket for collision
+      --else find the next available bucket for new hash
+      IF hMod(col_hash, nxt_rehash) > hMod(hash, nxt_rehash) THEN
+        IF hEmpty(tbl[index].key, tbl[index].val, tbl) THEN
+%ifeq DEBUG_BUILD TRUE
+          WRITE TPDISPLAY(CR, 'hsh:', key, ' idx: ', index)
+%endif
+          RETURN(index)
+        ELSE
+          -- did not find index
+          RETURN(0)
+        ENDIF
+      ELSE
+        index2 = hEmptyIndex(hash, tbl)
+        IF index2 > 0 THEN
+%ifeq DEBUG_BUILD TRUE
+          WRITE TPDISPLAY(CR, 'hsh:', key, ' idx: ', index2)
+%endif
+          RETURN(index2)
+        ELSE
+          -- did not find index
+          RETURN(0)
+        ENDIF
+      ENDIF
+
+    ENDIF
+
+  END hPutIndex
+
+--Public Members
+
+ROUTINE init
+  BEGIN
+    --clear table
+    clear(tbl)
+    --reset bit hash
+    tbl.n = 0
+    tbl.i = 0
+    tbl.occupancy = 1
+
+  END init
+
+ROUTINE destructor
+  VAR
+    uninit_h : t_linear_hsh
+  BEGIN
+    --clear table
+    clear(tbl)
+    --reset bit hash
+    tbl = uninit_h
+  END destructor
+
+ROUTINE put
+  VAR
+    index : INTEGER
+  BEGIN
+    --Expand table if it has reached occupancy rate
+    IF expandOccupancy(tbl) THEN
+      expand(tbl)
+    ENDIF
+
+    index = hPutIndex(key, tbl)
+    
+    IF index > 0 THEN
+      tbl[index].key = key
+      tbl[index].val = value
+
+      --calculate occupancy
+      tbl.occupancy = tbl.n/PATH_LEN(tbl)
+
+      RETURN(TRUE)
+    ELSE
+      RETURN(FALSE)
+    ENDIF
+  END put
+
+ROUTINE get
+  VAR
+    index : INTEGER
+    empty   : hval_def
+  BEGIN
+    index = hGetIndex(key, tbl)
+
+    IF index = 0 THEN RETURN(FALSE); ENDIF
+    out_val = tbl[index].val
+    RETURN(TRUE)
+  END get
+
+ROUTINE delete
+  VAR
+    index : INTEGER
+    empty   : hval_def
+    uninit_kv : hashname
+  BEGIN
+    index = hGetIndex(key, tbl)
+    IF index > 0 THEN
+      --decrease bin occupancy
+      tbl.n = tbl.n - 1
+      tbl[index] = uninit_kv
+
+      -- check if table should be shrunk
+      IF shrinkOccupancy(tbl) THEN
+        shrink(tbl)
+      ENDIF
+
+      RETURN(TRUE)
+    ENDIF
+
+    RETURN(FALSE)
+  END delete
+
+
+BEGIN
+END class_name
