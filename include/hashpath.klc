@@ -23,7 +23,7 @@ t_hash(hashname,hval_def,class_name)
 
 --define path header
 %include hashpath.klt
-hashpath_type_define(class_name)
+hash_header_define(class_name)
 
 --VARS
 

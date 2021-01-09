@@ -6,7 +6,7 @@ PROGRAM test_pathhsh
 
 --define path header
 %include hashpath.klt
-hashpath_type_define(hshint)
+hash_header_define(hshint)
 
 -- INTEGER hash
 %include hashint.klt

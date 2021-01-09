@@ -3,8 +3,8 @@
 --graph type
 %mode push
 %mode string QQQ "`" "`" "\\"
-%define hashpath_type_define(nme) `TYPE
-  t_linear_hsh FROM nme = STRUCTURE
+%define hash_header_define(parent) `TYPE
+  t_linear_hsh FROM parent = STRUCTURE
     n : INTEGER --current number of bins in use
     i : INTEGER -- number of bits used in hash value
     occupancy : REAL
