@@ -5,7 +5,9 @@ PROGRAM class_name
 -- adapted linear hashing method
 -- (*ref : http://www.mathcs.emory.edu/~cheung/Courses/554/Syllabus/3-index/linear-hashing-new2.html)
 
-%define DEBUG_BUILD FALSE
+--debug flags
+%define DEBUG_GET FALSE
+%define DEBUG_PUT FALSE
 
 %include namespace.m
 
@@ -56,14 +58,14 @@ ROUTINE jsStr
   BEGIN
     hash = 0
     FOR i=1 TO STR_LEN(str) DO
-      hash = (31 * hash) + ord(str, i)
+      hash = ABS((31 * hash) + ord(str, i))
     ENDFOR
     RETURN(hash)
   END jsStr
 
 ROUTINE hMod
   BEGIN
-    RETURN((hash MOD TRUNC(math__pow(2, (bit_shift))) + 1) )
+    RETURN(((hash-1) MOD TRUNC(math__pow(2, (bit_shift))) ) + 1 )
   END hMod
 
 ROUTINE expandOccupancy
@@ -127,7 +129,7 @@ ROUTINE rehash
           IF remap_b THEN
             remap_i = hPutIndex(tbl[i].key, tbl)
 
-%ifeq DEBUG_BUILD TRUE
+%ifeq DEBUG_PUT TRUE
             WRITE TPDISPLAY(CR, 'remap ', tbl[i].key, ' to ', remap_i)
 %endif
     
@@ -194,18 +196,18 @@ ROUTINE shrink
 
 ROUTINE hGetIndex
   VAR
-    hash      : INTEGER
-    index     : INTEGER
-    count     : INTEGER
+    hash        : INTEGER
+    index  : INTEGER
+    i     : INTEGER
   BEGIN
     hash = jsStr(key)
     index = hMod(hash, tbl.i)
 
-    FOR count=0 TO PATH_LEN(tbl)-1 DO
+    FOR i=1 TO PATH_LEN(tbl) DO
       IF UNINIT(tbl[index].key) THEN tbl[index].key = ''; ENDIF
 
       -- get requests require key=key
-      IF ((tbl[index].key=key)) THEN
+      IF (jsStr(tbl[index].key)=hash) THEN
         RETURN(index)
       ENDIF
 
@@ -248,7 +250,7 @@ ROUTINE hEmpty
     hash = jsStr(key)
     index = hEmptyIndex(hash, tbl)
 
-%ifeq DEBUG_BUILD TRUE
+%ifeq DEBUG_PUT TRUE
     WRITE TPDISPLAY(CR, 'move hsh: ', key, ' idx: ', index)
 %endif
 
@@ -272,12 +274,16 @@ ROUTINE hPutIndex
     hash = jsStr(key)
     index = hMod(hash, tbl.i)
 
+%ifeq DEBUG_PUT TRUE
+    WRITE TPDISPLAY(CR, 'index:', index, ' key: ', key)
+%endif
+
     IF UNINIT(tbl[index].key) THEN tbl[index].key = ''; ENDIF
 
     -- put requests require key=key or empty
     IF (tbl[index].key='') THEN
   
-%ifeq DEBUG_BUILD TRUE
+%ifeq DEBUG_PUT TRUE
       WRITE TPDISPLAY(CR, 'hsh: ', key, ' idx: ', index)
 %endif
 
@@ -285,12 +291,13 @@ ROUTINE hPutIndex
       tbl.n = tbl.n + 1
       RETURN(index)
     ENDIF
-    IF (tbl[index].key=key) THEN
+
+    col_hash = jsStr(tbl[index].key)
+    IF (col_hash=hash) THEN
       RETURN(index)
     ELSE
       --if collision determine which key will change bin number first
       -- during expansion
-      col_hash = jsStr(tbl[index].key)
       nxt_rehash = tbl.i
       REPEAT
         nxt_rehash = nxt_rehash + 1
@@ -300,7 +307,7 @@ ROUTINE hPutIndex
       --else find the next available bucket for new hash
       IF hMod(col_hash, nxt_rehash) > hMod(hash, nxt_rehash) THEN
         IF hEmpty(tbl[index].key, tbl[index].val, tbl) THEN
-%ifeq DEBUG_BUILD TRUE
+%ifeq DEBUG_PUT TRUE
           WRITE TPDISPLAY(CR, 'hsh:', key, ' idx: ', index)
 %endif
           RETURN(index)
@@ -311,7 +318,7 @@ ROUTINE hPutIndex
       ELSE
         index2 = hEmptyIndex(hash, tbl)
         IF index2 > 0 THEN
-%ifeq DEBUG_BUILD TRUE
+%ifeq DEBUG_PUT TRUE
           WRITE TPDISPLAY(CR, 'hsh:', key, ' idx: ', index2)
 %endif
           RETURN(index2)
@@ -376,8 +383,16 @@ ROUTINE get
   VAR
     index : INTEGER
     empty   : hval_def
+    k : STRING[HSH_KEY_SIZE]
   BEGIN
-    index = hGetIndex(key, tbl)
+    --truncate string into max key size
+    k = key
+
+    index = hGetIndex(k, tbl)
+
+%ifeq DEBUG_GET TRUE
+    WRITE TPDISPLAY(CR, 'gt: ', k, ' idx: ', index)
+%endif
 
     IF index = 0 THEN RETURN(FALSE); ENDIF
     out_val = tbl[index].val
