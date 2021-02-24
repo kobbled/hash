@@ -15,10 +15,12 @@
     "include/types"
   ],
   "depends" : [
-    "KUnit",
     "errors",
     "math",
     "Strings",
     "ktransw-macros"
+  ],
+  "tests-depends" : [
+    "KUnit"
   ]
 }
