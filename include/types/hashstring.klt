@@ -2,6 +2,10 @@
 -- declare type
 -- hval_def is what you declare through t__hash
 -- hval_type is what you use in headers
+
+--hash string size
+%define HSH_KEY_SIZE 12
+
 %defeval hashname h_string
 %defeval hval_def STRING[16]
 %defeval hval_type STRING
