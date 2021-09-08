@@ -8,7 +8,7 @@
   "source" : [
   ],
   "tests" : [
-    "test/test_pathhsh.kl"
+    "test/test_hash.kl",
   ],
   "includes" : [
     "include",
@@ -21,6 +21,8 @@
     "ktransw-macros"
   ],
   "tests-depends" : [
-    "KUnit"
+    "KUnit",
+    "registers",
+    "display"
   ]
 }

@@ -42,7 +42,7 @@ VAR
 BEGIN
 	hash = 0
 	FOR i=1 TO STR_LEN(str) DO
-		hash = (31 * hash) + ord(str, i)
+		hash = ABS((31 * hash) + ord(str, i))
 	ENDFOR
 	RETURN(hash)
 END jsStr
