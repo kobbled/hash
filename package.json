@@ -8,7 +8,7 @@
   "source" : [
   ],
   "tests" : [
-    "test/test_hash.kl",
+    "test/test_pathhsh.kl"
   ],
   "includes" : [
     "include",
