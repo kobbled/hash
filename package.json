@@ -8,11 +8,13 @@
   "source" : [
   ],
   "tests" : [
-    "test/test_pathhsh.kl"
+    "test/test_hash.kl",
+    "test/test_pathhsh.kl",
   ],
   "includes" : [
-    "include",
-    "include/types"
+    "lib/hasharray",
+    "lib/hashpath",
+    "types"
   ],
   "depends" : [
     "errors",
