@@ -1,0 +1,99 @@
+PROGRAM tst_hshenv
+%NOLOCKGROUP
+
+-- declare type
+%include define_type.m
+
+%include register_types.klt
+--include value type
+%include hashenv.klt
+hash_type_define(hashenv)
+--create hash type
+t_hash(hashname,hval_def,hashenv)
+
+VAR
+  name : STRING[16]
+  reg : hval_def
+  b : BOOLEAN
+	tbl FROM env: ARRAY[20] OF hashname
+
+%include display.klh
+%include registers.klh
+
+%class hashenv('hash.klc','hashclass.klh','hashenv.klt')
+
+ROUTINE nullenv : hval_def
+  VAR
+    null : hval_def
+  BEGIN
+    null.typ = INVALIDTYPE ; null.id = 0
+    RETURN(null)
+  END nullenv
+
+ROUTINE print_envTbl
+  VAR
+    i : INTEGER
+  BEGIN
+    i=1
+    WHILE (i <= ARRAY_LEN(tbl)) DO
+      IF (tbl[i].key <> '') THEN
+        SELECT tbl[i].val.typ OF
+          CASE(DATA_REG):
+            display__print_line(display__register((tbl[i].val.id), TRUE))
+          CASE(DATA_POSREG):
+            display__print_line(display__posreg((tbl[i].val.id), 1, TRUE))
+          CASE(DATA_STRING):
+            display__print_line(display__string_reg((tbl[i].val.id), TRUE))
+          ELSE:
+            display__print_line(display__io(registers__get_type_name((tbl[i].val.typ)), (tbl[i].val.id), TRUE))
+        ENDSELECT
+      ENDIF
+      i = i + 1
+    ENDWHILE
+  END print_envTbl
+
+ROUTINE set_comments
+  VAR
+    i : INTEGER
+  BEGIN
+    i=1
+    WHILE (i <= ARRAY_LEN(tbl)) DO
+      IF (tbl[i].key <> '') THEN
+        registers__set_comment((tbl[i].val.typ), (tbl[i].val.id), (tbl[i].key))
+      ENDIF
+      i = i + 1
+    ENDWHILE
+  END set_comments
+
+BEGIN
+  display__clear
+
+  reg = nullenv
+  b = hashenv__clear_table('env', 'tbl', reg)
+
+  name = 'poopybutt'
+  reg.typ = DATA_REG ; reg.id = 1
+  b = hashenv__put(name, reg, 'env', 'tbl')
+
+  name = 'Home_Robot'
+  reg.typ = DATA_POSREG ; reg.id = 1
+  b = hashenv__put(name, reg, 'env', 'tbl')
+
+  name = 'Laser_Power'
+  reg.typ = io_anout ; reg.id = 1
+  b = hashenv__put(name, reg, 'env', 'tbl')
+
+  name = 'longjohnson'
+  reg.typ = io_din ; reg.id = 1
+  b = hashenv__put(name, reg, 'env', 'tbl')
+
+  name = 'Hmi_Start'
+  reg.typ = io_flag ; reg.id = 1
+  b = hashenv__put(name, reg, 'env', 'tbl')
+
+  set_comments
+  print_envTbl
+
+  display__show
+  
+END tst_hshenv

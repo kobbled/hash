@@ -1,0 +1,18 @@
+%include define_type.m
+
+%define HSH_KEY_SIZE 16
+
+%mode push
+%mode string QQQ "`" "`" "\\"
+%define hash_type_define(obj_name) `
+TYPE
+  T_ENV FROM obj_name = STRUCTURE
+    typ : SHORT
+    id : SHORT
+  ENDSTRUCTURE`
+%mode pop
+
+%defeval hashname h_env
+%defeval hval_def T_ENV
+%defeval hval_type T_ENV
+

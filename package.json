@@ -10,6 +10,7 @@
   "tests" : [
     "test/test_hash.kl",
     "test/test_pathhsh.kl",
+    "test/tst_hshenv.kl"
   ],
   "includes" : [
     "lib/hasharray",
