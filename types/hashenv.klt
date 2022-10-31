@@ -1,6 +1,6 @@
 %include define_type.m
 
-%define HSH_KEY_SIZE 16
+%define HSH_KEY_SIZE 24
 
 %mode push
 %mode string QQQ "`" "`" "\\"
